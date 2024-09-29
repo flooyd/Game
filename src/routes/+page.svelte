@@ -615,7 +615,7 @@
 	input {
 		font-size: 20px;
 		border: 3px solid lightgreen;
-		min-width: 350px;
+		min-width: 250px;
 		border-radius: 5px;
 		padding: 5px;
 		z-index: 1000;
