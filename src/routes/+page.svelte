@@ -21,7 +21,7 @@
 	let todos: any[] = [];
 	let leftMouseDown: boolean;
 	//create a 2d grid that is empty
-	let grid = [];
+	let grid: any[] = [];
 	// grid.push({
 	// 	x: 0,
 	// 	y: 0,
@@ -315,28 +315,28 @@
 		return start + (end - start) * t;
 	}
 
-let lastUpdateTime = Date.now();
+	let lastUpdateTime = Date.now();
 
-function updateOtherPlayers(deltaTime: number) {
-  const currentTime = Date.now();
-  const timeSinceLastUpdate = currentTime - lastUpdateTime;
-  
-  otherPlayers.forEach((player) => {
-    if (!player.prevX || !player.prevY) {
-      player.prevX = player.x;
-      player.prevY = player.y;
-    }
+	function updateOtherPlayers(deltaTime: number) {
+		const currentTime = Date.now();
+		const timeSinceLastUpdate = currentTime - lastUpdateTime;
 
-    // Calculate interpolation factor based on time
-    const t = Math.min(timeSinceLastUpdate / 100, 60);
+		otherPlayers.forEach((player) => {
+			if (!player.prevX || !player.prevY) {
+				player.prevX = player.x;
+				player.prevY = player.y;
+			}
 
-    // Interpolate position
-    player.x = lerp(player.prevX, player.x, t);
-    player.y = lerp(player.prevY, player.y, t);
-  });
+			// Calculate interpolation factor based on time
+			const t = Math.min(timeSinceLastUpdate / 100, 60);
 
-  lastUpdateTime = currentTime;
-}
+			// Interpolate position
+			player.x = lerp(player.prevX, player.x, t);
+			player.y = lerp(player.prevY, player.y, t);
+		});
+
+		lastUpdateTime = currentTime;
+	}
 
 	// Handle WASD movement
 	function move(deltaTime: number) {
@@ -432,7 +432,7 @@ function updateOtherPlayers(deltaTime: number) {
 	{/if}
 	{#if !homeScreen}
 		{#each todos as todo}
-			<div class="todoContainer" style="left: {todo.x}px; top: {todo.y}px;">
+			<div transition:fade class="todoContainer" style="left: {todo.x}px; top: {todo.y}px;">
 				<div class={todo.done ? 'done' : ''}>
 					{todo.task} :: {todo.author}
 				</div>
