@@ -613,9 +613,9 @@
 	}
 
 	input {
-		font-size: 20px;
-		border: 3px solid lightgreen;
-		min-width: 250px;
+		font-size: 16px;
+		border: 1px solid lightgreen;
+		min-width: 200px;
 		border-radius: 5px;
 		padding: 5px;
 		z-index: 1000;
