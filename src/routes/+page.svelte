@@ -5,7 +5,18 @@
 	import { fade } from 'svelte/transition';
 
 	let mousePosition = { x: 0, y: 0 };
-	let player = { name: '', x: 0, y: 0, width: 30, height: 30, speed: 0.5, area: null, id: null }; // Initialized at center (2500, 2500)
+	let player = {
+		name: '',
+		x: 0,
+		y: 0,
+		width: 30,
+		height: 30,
+		speed: 0.5,
+		area: null,
+		id: null,
+		prevX: null,
+		prevY: null
+	}; // Initialized at center (2500, 2500)
 	let otherPlayers: any[] = [];
 	let todos: any[] = [];
 	let leftMouseDown: boolean;
@@ -188,7 +199,7 @@
 		socket.on('OtherPlayerMove', (data) => {
 			let otherPlayer = otherPlayers.find((p) => p.id === data.id);
 			otherPlayers = otherPlayers.map((p) =>
-				p.id === data.id ? { ...p, x: data.x, y: data.y } : p
+				p.id === data.id ? { ...p, x: data.x, y: data.y, prevX: p.x, prevyY: p.y } : p
 			);
 		});
 
@@ -291,12 +302,25 @@
 
 		// Handle WASD movement
 		move(deltaTime);
+		updateOtherPlayers(deltaTime);
 
 		// Center the view on the player
 		centerView();
 
 		lastTime = time;
 		requestAnimationFrame(loop);
+	}
+
+	function lerp(start: number, end: number, t: number) {
+		return start + (end - start) * t;
+	}
+
+	function updateOtherPlayers(deltaTime: number) {
+		const lerpFactor = 0.05; // Adjust this value to control the interpolation speed
+		otherPlayers.forEach((player, id) => {
+			player.x = lerp(player.prevX, player.x, lerpFactor);
+			player.y = lerp(player.prevY, player.y, lerpFactor);
+		});
 	}
 
 	// Handle WASD movement
@@ -522,10 +546,10 @@
 	/* Ensure the main area is large enough to allow scrolling */
 	main {
 		position: relative;
-		overflow: hidden;
+
 		height: 5000px;
 		width: 5000px;
-		background-color: #f0f0f0; /* Optional: to visualize the area */
+		background-color: white; /* Optional: to visualize the area */
 	}
 
 	.main-login {
@@ -539,7 +563,7 @@
 		top: 0px;
 		left: 0px;
 		width: 100dvw;
-		height: 100vh;
+		height: 100dvh;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
