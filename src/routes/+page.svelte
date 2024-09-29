@@ -22,13 +22,13 @@
 	let leftMouseDown: boolean;
 	//create a 2d grid that is empty
 	let grid = [];
-	grid.push({
-		x: 0,
-		y: 0,
-		width: 100,
-		height: 100,
-		color: 'red'
-	});
+	// grid.push({
+	// 	x: 0,
+	// 	y: 0,
+	// 	width: 100,
+	// 	height: 100,
+	// 	color: 'red'
+	// });
 	let homeScreen = true;
 	let login = true;
 	let register = false;
