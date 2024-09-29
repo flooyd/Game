@@ -58,7 +58,7 @@
 
 	// Handle touch start
 	function handleTouchStart(event: TouchEvent) {
-		event.preventDefault();
+		//event.preventDefault();
 		mousePosition = {
 			x: event.touches[0].clientX,
 			y: event.touches[0].clientY
@@ -68,7 +68,7 @@
 
 	// Handle touch end
 	function handleTouchEnd(event: TouchEvent) {
-		event.preventDefault();
+		//event.preventDefault();
 		leftMouseDown = false;
 	}
 
