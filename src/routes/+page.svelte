@@ -275,7 +275,7 @@
 		}
 
 		// Update player position
-		if (time - lastPlayerUpdate >= 1000 / 30 && shouldUpdatePlayer) {
+		if (time - lastPlayerUpdate >= 1000 / 60 && shouldUpdatePlayer) {
 			lastPlayerUpdate = time;
 			socket?.emit('PlayerMove', player);
 			shouldUpdatePlayer = false;
@@ -315,13 +315,28 @@
 		return start + (end - start) * t;
 	}
 
-	function updateOtherPlayers(deltaTime: number) {
-		const lerpFactor = 0.5; // Adjust this value to control the interpolation speed
-		otherPlayers.forEach((player, id) => {
-			player.x = lerp(player.prevX, player.x, lerpFactor);
-			player.y = lerp(player.prevY, player.y, lerpFactor);
-		});
-	}
+let lastUpdateTime = Date.now();
+
+function updateOtherPlayers(deltaTime: number) {
+  const currentTime = Date.now();
+  const timeSinceLastUpdate = currentTime - lastUpdateTime;
+  
+  otherPlayers.forEach((player) => {
+    if (!player.prevX || !player.prevY) {
+      player.prevX = player.x;
+      player.prevY = player.y;
+    }
+
+    // Calculate interpolation factor based on time
+    const t = Math.min(timeSinceLastUpdate / 100, 60);
+
+    // Interpolate position
+    player.x = lerp(player.prevX, player.x, t);
+    player.y = lerp(player.prevY, player.y, t);
+  });
+
+  lastUpdateTime = currentTime;
+}
 
 	// Handle WASD movement
 	function move(deltaTime: number) {
