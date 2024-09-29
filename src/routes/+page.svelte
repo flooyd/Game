@@ -127,7 +127,7 @@
 		window.addEventListener('keypress', handleKeyPress);
 
 		// Connect to the server
-		socket = io('ws://ec2-18-117-172-171.us-east-2.compute.amazonaws.com:443');
+		socket = io('wss://ec2-18-117-172-171.us-east-2.compute.amazonaws.com:443');
 
 		socket.on('connect', () => {
 			console.log('Connected to server');
