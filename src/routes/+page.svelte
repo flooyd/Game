@@ -545,7 +545,7 @@
 
 	.bottomBar {
 		position: fixed;
-		top: calc(100vh - 36px);
+		top: calc(100dvh - 36px);
 		left: 0;
 		width: 100%;
 		background-color: rgba(0, 0, 0, 0.75);
