@@ -29,6 +29,8 @@
 	let editing = false;
 	let creating = false;
 	let editTodoInput: HTMLInputElement | null = null;
+	let width = 0;
+	let height = 0;
 
 	// Handle mouse movement
 	function handleMouseMove(event: { clientX: number; clientY: number }) {
@@ -214,6 +216,9 @@
 			todos = data;
 		});
 
+		width = window.innerWidth;
+		height = window.innerHeight;
+
 		// Start the animation loop
 		requestAnimationFrame(loop);
 
@@ -325,6 +330,8 @@
 	{#if homeScreen}
 		<div transition:fade class="homeScreen">
 			<h1>The Game</h1>
+			<h3>width: {width}</h3>
+			<h3>height: {height}</h3>
 			<div class="flexer">
 				<button
 					on:click={() => {
