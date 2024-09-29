@@ -691,4 +691,16 @@
 	.done {
 		text-decoration: line-through;
 	}
+
+	@media (max-width: 600px) {
+		h1 {
+			font-size: 23.04px;
+		}
+		h3 {
+			font-size: 19.2px;
+		}
+		.playerName {
+			font-size: 16px;
+		}
+	}
 </style>
