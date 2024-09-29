@@ -8,7 +8,7 @@
 	let player = { name: '', x: 0, y: 0, width: 30, height: 30, speed: 0.5, area: null, id: null }; // Initialized at center (2500, 2500)
 	let otherPlayers: any[] = [];
 	let todos: any[] = [];
-	let rightMouseDown: boolean;
+	let leftMouseDown: boolean;
 	//create a 2d grid that is empty
 	let grid = [];
 	grid.push({
@@ -40,28 +40,36 @@
 		};
 	}
 
-	// Handle right mouse button down
-	function handleRightMouseDown(event: MouseEvent) {
-		if (event.button === 2) {
-			rightMouseDown = true;
-		}
-
+	// Handle left mouse button down
+	function handleLeftMouseDown(event: MouseEvent) {
 		//if left mouse button is clicked
 		if (event.button === 0) {
-			rightMouseDown = true;
+			leftMouseDown = true;
 		}
 	}
 
-	// Handle right mouse button up
-	function handleRightMouseUp(event: MouseEvent) {
-		if (event.button === 2) {
-			rightMouseDown = false;
-		}
-
+	// Handle left mouse button up
+	function handleLeftMouseUp(event: MouseEvent) {
 		//if left mouse button is up
 		if (event.button === 0) {
-			rightMouseDown = false;
+			leftMouseDown = false;
 		}
+	}
+
+	// Handle touch start
+	function handleTouchStart(event: TouchEvent) {
+		event.preventDefault();
+		mousePosition = {
+			x: event.touches[0].clientX,
+			y: event.touches[0].clientY
+		};
+		leftMouseDown = true;
+	}
+
+	// Handle touch end
+	function handleTouchEnd(event: TouchEvent) {
+		event.preventDefault();
+		leftMouseDown = false;
 	}
 
 	// Handle keyboard input
@@ -121,9 +129,10 @@
 	onMount(() => {
 		// Add event listeners
 		window.addEventListener('mousemove', handleMouseMove);
-		window.addEventListener('mousedown', handleRightMouseDown);
-		window.addEventListener('mouseup', handleRightMouseUp);
-		window.addEventListener('contextmenu', (e) => e.preventDefault());
+		window.addEventListener('mousedown', handleLeftMouseDown);
+		window.addEventListener('mouseup', handleLeftMouseUp);
+		window.addEventListener('touchstart', handleTouchStart);
+		window.addEventListener('touchend', handleTouchEnd);
 		window.addEventListener('keydown', handleInput);
 		window.addEventListener('keyup', handleInput);
 		window.addEventListener('keypress', handleKeyPress);
@@ -227,8 +236,6 @@
 
 		// Cleanup on component unmount
 		return () => {
-			window.removeEventListener('mousemove', handleMouseMove);
-			window.removeEventListener('mousedown', handleRightMouseDown);
 			window.removeEventListener('mouseup', handleRightMouseUp);
 			window.removeEventListener('contextmenu', (e) => e.preventDefault());
 			window.removeEventListener('keydown', handleInput);
@@ -264,7 +271,7 @@
 		}
 
 		// Move player towards mouse if right button is held down
-		if (rightMouseDown) {
+		if (leftMouseDown) {
 			const dx = mousePosition.x - player.x - player.width / 2;
 			const dy = mousePosition.y - player.y - player.height / 2;
 			const angle = Math.atan2(dy, dx);
@@ -294,7 +301,7 @@
 
 	// Handle WASD movement
 	function move(deltaTime: number) {
-		if (rightMouseDown || homeScreen) return;
+		if (leftMouseDown || homeScreen) return;
 
 		let dx = 0;
 		let dy = 0;
