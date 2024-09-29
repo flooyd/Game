@@ -275,7 +275,7 @@
 		}
 
 		// Update player position
-		if (time - lastPlayerUpdate >= 1000 / 128 && shouldUpdatePlayer) {
+		if (time - lastPlayerUpdate >= 1000 / 30 && shouldUpdatePlayer) {
 			lastPlayerUpdate = time;
 			socket?.emit('PlayerMove', player);
 			shouldUpdatePlayer = false;
@@ -316,7 +316,7 @@
 	}
 
 	function updateOtherPlayers(deltaTime: number) {
-		const lerpFactor = 1; // Adjust this value to control the interpolation speed
+		const lerpFactor = 0.5; // Adjust this value to control the interpolation speed
 		otherPlayers.forEach((player, id) => {
 			player.x = lerp(player.prevX, player.x, lerpFactor);
 			player.y = lerp(player.prevY, player.y, lerpFactor);
