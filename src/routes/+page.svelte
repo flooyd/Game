@@ -519,7 +519,7 @@
 		z-index: 1000;
 		top: 0px;
 		left: 0px;
-		width: 100vw;
+		width: 100dvw;
 		height: 100vh;
 		display: flex;
 		flex-direction: column;
@@ -646,7 +646,7 @@
 		align-items: center;
 		gap: 9.26px;
 		min-height: 46.4px;
-		max-width: 75vw;
+		max-width: 75dvw;
 	}
 
 	.editTodo {
