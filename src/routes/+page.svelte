@@ -236,10 +236,10 @@
 
 		// Cleanup on component unmount
 		return () => {
-			window.removeEventListener('mouseup', handleRightMouseUp);
-			window.removeEventListener('contextmenu', (e) => e.preventDefault());
-			window.removeEventListener('keydown', handleInput);
-			window.removeEventListener('keyup', handleInput);
+			// window.removeEventListener('mouseup', handleRightMouseUp);
+			// window.removeEventListener('contextmenu', (e) => e.preventDefault());
+			// window.removeEventListener('keydown', handleInput);
+			// window.removeEventListener('keyup', handleInput);
 		};
 	});
 
