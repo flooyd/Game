@@ -44,7 +44,7 @@
 	function handleLeftMouseDown(event: MouseEvent) {
 		//if left mouse button is clicked
 		if (event.button === 0) {
-			leftMouseDown = true;
+			//leftMouseDown = true;
 		}
 	}
 
@@ -52,7 +52,7 @@
 	function handleLeftMouseUp(event: MouseEvent) {
 		//if left mouse button is up
 		if (event.button === 0) {
-			leftMouseDown = false;
+			//leftMouseDown = false;
 		}
 	}
 
