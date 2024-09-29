@@ -326,7 +326,7 @@
 	$: (creating && editTodoInput?.focus()) || (editing && editTodoInput?.focus());
 </script>
 
-<main>
+<main class={homeScreen ? 'main-login' : ''}>
 	{#if homeScreen}
 		<div transition:fade class="homeScreen">
 			<h1>The Game</h1>
@@ -516,9 +516,14 @@
 	main {
 		position: relative;
 		overflow: hidden;
-		width: 5030px;
-		height: 5030px;
+		height: 5000px;
+		width: 5000px;
 		background-color: #f0f0f0; /* Optional: to visualize the area */
+	}
+
+	.main-login {
+		width: 100dvw;
+		height: 100dvh;
 	}
 
 	.homeScreen {
