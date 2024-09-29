@@ -316,7 +316,7 @@
 	}
 
 	function updateOtherPlayers(deltaTime: number) {
-		const lerpFactor = 0.05; // Adjust this value to control the interpolation speed
+		const lerpFactor = 0.25; // Adjust this value to control the interpolation speed
 		otherPlayers.forEach((player, id) => {
 			player.x = lerp(player.prevX, player.x, lerpFactor);
 			player.y = lerp(player.prevY, player.y, lerpFactor);
