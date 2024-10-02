@@ -3,9 +3,8 @@
 	import { io, Socket } from 'socket.io-client';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
-
 	let mousePosition = { x: 0, y: 0 };
-	let player = {
+	let player: any | null = {
 		name: '',
 		x: 0,
 		y: 0,
@@ -42,6 +41,7 @@
 	let editTodoInput: HTMLInputElement | null = null;
 	let width = 0;
 	let height = 0;
+	let registerSuccess = false;
 
 	// Handle mouse movement
 	function handleMouseMove(event: { clientX: number; clientY: number }) {
@@ -149,7 +149,11 @@
 		window.addEventListener('keypress', handleKeyPress);
 
 		// Connect to the server
-		socket = io('https://gameserver-6052.onrender.com');
+		if (window.location.toString().includes('localhost')) {
+			socket = io('http://localhost:3000');
+		} else {
+			socket = io('https://gameserver-6052.onrender.com');
+		}
 
 		socket.on('connect', () => {
 			console.log('Connected to server');
@@ -161,6 +165,12 @@
 
 		socket.on('Registered', (player) => {
 			console.log('Registered');
+			username = '';
+			password = '';
+			email = '';
+			registerSuccess = true;
+			login = true;
+			register = false;
 		});
 
 		socket.on('RegistrationFailed', (message) => {
@@ -170,10 +180,8 @@
 		socket.on('LoginSuccess', (authPlayer) => {
 			console.log('LoginSuccess', authPlayer.x, authPlayer.y);
 			homeScreen = false;
-			player.x = authPlayer.x;
-			player.y = authPlayer.y;
-			player.id = authPlayer.id;
-			player.name = authPlayer.name;
+			player = authPlayer;
+			player.speed = 0.5;
 		});
 
 		socket.on('LoginFailed', (message) => {
@@ -242,9 +250,6 @@
 		// Start the animation loop
 		requestAnimationFrame(loop);
 
-		// Initial centering
-		centerView();
-
 		// Cleanup on component unmount
 		return () => {
 			// window.removeEventListener('mouseup', handleRightMouseUp);
@@ -274,38 +279,40 @@
 			lastFpsUpdateTime = time;
 		}
 
-		// Update player position
-		if (time - lastPlayerUpdate >= 1000 / 60 && shouldUpdatePlayer) {
-			lastPlayerUpdate = time;
-			socket?.emit('PlayerMove', player);
-			shouldUpdatePlayer = false;
-		}
-
-		// Move player towards mouse if right button is held down
-		if (leftMouseDown) {
-			const dx = mousePosition.x - player.x - player.width / 2;
-			const dy = mousePosition.y - player.y - player.height / 2;
-			const angle = Math.atan2(dy, dx);
-			const vx = Math.cos(angle) * player.speed * deltaTime;
-			const vy = Math.sin(angle) * player.speed * deltaTime;
-
-			// Move only if the player is not within 2 units of the target
-			if (!(Math.abs(dx) < 2 && Math.abs(dy) < 2)) {
-				player = {
-					...player,
-					x: player.x + vx,
-					y: player.y + vy
-				};
-				shouldUpdatePlayer = true;
+		if (player) {
+			// Update player position
+			if (time - lastPlayerUpdate >= 1000 / 60 && shouldUpdatePlayer) {
+				lastPlayerUpdate = time;
+				socket?.emit('PlayerMove', player);
+				shouldUpdatePlayer = false;
 			}
+
+			// Move player towards mouse if right button is held down
+			if (leftMouseDown) {
+				const dx = mousePosition.x - player.x - player.width / 2;
+				const dy = mousePosition.y - player.y - player.height / 2;
+				const angle = Math.atan2(dy, dx);
+				const vx = Math.cos(angle) * player.speed * deltaTime;
+				const vy = Math.sin(angle) * player.speed * deltaTime;
+
+				// Move only if the player is not within 2 units of the target
+				if (!(Math.abs(dx) < 2 && Math.abs(dy) < 2)) {
+					player = {
+						...player,
+						x: player.x + vx,
+						y: player.y + vy
+					};
+					shouldUpdatePlayer = true;
+				}
+			}
+
+			// Handle WASD movement
+			move(deltaTime);
+			// Center the view on the player
+			centerView();
 		}
 
-		// Handle WASD movement
-		move(deltaTime);
 		updateOtherPlayers(deltaTime);
-
-		// Center the view on the player
-		centerView();
 
 		lastTime = time;
 		requestAnimationFrame(loop);
@@ -376,8 +383,9 @@
 	{#if homeScreen}
 		<div transition:fade class="homeScreen">
 			<h1>The Game</h1>
-			<h3>width: {width}</h3>
-			<h3>height: {height}</h3>
+			{#if registerSuccess}
+				<div class="highlight">Registration successful! Please login.</div>
+			{/if}
 			<div class="flexer">
 				<button
 					on:click={() => {
@@ -505,7 +513,7 @@
 				style="left: {cell.x}px; top: {cell.y}px; width: {cell.width}px; height: {cell.height}px; background-color: {cell.color};"
 			></div>
 		{/each}
-		<div class="playerName" style="left: {player.x}px; top: {player.y - 25}px;">
+		<div class="playerName" style="left: {player.x}px; top: {player.y - 35}px;">
 			{player.name}
 		</div>
 		<div
@@ -513,7 +521,7 @@
 			style="left: {player.x}px; top: {player.y}px; width: {player.width}px; height: {player.height}px;"
 		></div>
 		{#each otherPlayers as otherPlayer}
-			<div class="playerName" style="left: {otherPlayer.x}px; top: {otherPlayer.y - 25}px;">
+			<div class="playerName" style="left: {otherPlayer.x}px; top: {otherPlayer.y - 35}px;">
 				{otherPlayer.name}
 			</div>
 			<div
@@ -530,6 +538,7 @@
 					class="danger"
 					on:click={() => {
 						socket?.emit('Logout', player.id);
+						player = null;
 						homeScreen = true;
 					}}
 				>
@@ -585,7 +594,7 @@
 		align-items: center;
 		background-color: rgba(0, 0, 0, 1);
 		color: white;
-		gap: 33.18px;
+		gap: 19.2px;
 	}
 
 	.topBar {
@@ -726,16 +735,27 @@
 		justify-content: center;
 		background-color: red;
 		border-radius: 50%; /* Optional: make the player circular */
+		z-index: 1001;
 	}
 
 	.playerName {
 		position: absolute;
 		color: black;
 		font-size: 19.2px;
+		background: white;
+		border: 1px solid black;
+		padding: 5px;
+		border-radius: 5px;
+		z-index: 1001;
 	}
 
 	.done {
 		text-decoration: line-through;
+	}
+
+	.highlight {
+		color: lightgreen;
+		font-weight: bold;
 	}
 
 	@media (max-width: 600px) {
