@@ -147,14 +147,6 @@
 		window.addEventListener('keydown', handleInput);
 		window.addEventListener('keyup', handleInput);
 		window.addEventListener('keypress', handleKeyPress);
-		window.addEventListener('focus', () => {
-			wasd = {
-				w: false,
-				a: false,
-				s: false,
-				d: false
-			};
-		});
 		window.addEventListener('blur', () => {
 			wasd = {
 				w: false,
