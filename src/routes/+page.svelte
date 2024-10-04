@@ -743,7 +743,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background-color: red;
+		background-color: black;
 		border-radius: 50%; /* Optional: make the player circular */
 		z-index: 1001;
 	}
