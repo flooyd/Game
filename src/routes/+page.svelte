@@ -332,25 +332,50 @@
 
 	let lastUpdateTime = Date.now();
 
-	function updateOtherPlayers(deltaTime: number) {
-		const currentTime = Date.now();
-		const timeSinceLastUpdate = currentTime - lastUpdateTime;
+	const INTERPOLATION_BUFFER_SIZE = 3;
+const INTERPOLATION_DELAY = 100; // ms
 
-		otherPlayers.forEach((player) => {
-			if (!player.prevX || !player.prevY) {
-				player.prevX = player.x;
-				player.prevY = player.y;
-			}
+function updateOtherPlayers(deltaTime: number) {
+    const currentTime = Date.now();
 
-			// Calculate interpolation factor based on time
-			const t = Math.min(timeSinceLastUpdate / 100, 60);
+    otherPlayers.forEach((player) => {
+        if (!player.positionBuffer) {
+            player.positionBuffer = [];
+        }
 
-			// Interpolate position
-			player.x = lerp(player.prevX, player.x, t);
-			player.y = lerp(player.prevY, player.y, t);
-		});
+        // Add current position to the buffer
+        player.positionBuffer.push({ x: player.x, y: player.y, time: currentTime });
 
-		lastUpdateTime = currentTime;
+        // Keep only the last INTERPOLATION_BUFFER_SIZE positions
+        if (player.positionBuffer.length > INTERPOLATION_BUFFER_SIZE) {
+            player.positionBuffer.shift();
+        }
+
+        // Interpolate
+        if (player.positionBuffer.length >= 2) {
+            const targetTime = currentTime - INTERPOLATION_DELAY;
+            let i = player.positionBuffer.length - 1;
+
+            for (; i > 0; i--) {
+                if (player.positionBuffer[i].time <= targetTime) break;
+            }
+
+            const p0 = player.positionBuffer[Math.max(0, i - 1)];
+            const p1 = player.positionBuffer[i];
+
+            if (p0 && p1) {
+                const t = (targetTime - p0.time) / (p1.time - p0.time);
+                player.x = cubicInterpolation(p0.x, p1.x, t);
+                player.y = cubicInterpolation(p0.y, p1.y, t);
+            }
+        }
+    });
+}
+
+function cubicInterpolation(start: number, end: number, t: number): number {
+    const t2 = t * t;
+    const t3 = t2 * t;
+		return start * (1 - 3 * t2 + 2 * t3) + end * (3 * t2 - 2 * t3);
 	}
 
 	// Handle WASD movement
