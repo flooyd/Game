@@ -352,7 +352,7 @@
 			}
 
 			// Interpolate
-			if (player.positionBuffer.length >= 2) {
+			if (player.positionBuffer.length >= 59) {
 				const targetTime = currentTime - INTERPOLATION_DELAY;
 				let i = player.positionBuffer.length - 1;
 
