@@ -332,8 +332,8 @@
 
 	let lastUpdateTime = Date.now();
 
-	const INTERPOLATION_BUFFER_SIZE = 60;
-	const INTERPOLATION_DELAY = 16; // ms
+	const INTERPOLATION_BUFFER_SIZE = 3;
+	const INTERPOLATION_DELAY = 100; // ms
 
 	function updateOtherPlayers(deltaTime: number) {
 		const currentTime = Date.now();
@@ -352,7 +352,7 @@
 			}
 
 			// Interpolate
-			if (player.positionBuffer.length >= 59) {
+			if (player.positionBuffer.length >= 2) {
 				const targetTime = currentTime - INTERPOLATION_DELAY;
 				let i = player.positionBuffer.length - 1;
 
