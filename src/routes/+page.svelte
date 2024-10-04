@@ -155,6 +155,14 @@
 				d: false
 			};
 		});
+		window.addEventListener('blur', () => {
+			wasd = {
+				w: false,
+				a: false,
+				s: false,
+				d: false
+			};
+		});
 
 		// Connect to the server
 		if (window.location.toString().includes('localhost')) {
