@@ -147,6 +147,14 @@
 		window.addEventListener('keydown', handleInput);
 		window.addEventListener('keyup', handleInput);
 		window.addEventListener('keypress', handleKeyPress);
+		window.addEventListener('focus', () => {
+			wasd = {
+				w: false,
+				a: false,
+				s: false,
+				d: false
+			};
+		});
 
 		// Connect to the server
 		if (window.location.toString().includes('localhost')) {
@@ -608,6 +616,7 @@
 		justify-content: space-between;
 		align-items: center;
 		padding: 10px;
+		border-bottom: 3px solid black;
 	}
 
 	.bottomBar {
@@ -621,6 +630,7 @@
 		justify-content: space-between;
 		align-items: center;
 		padding: 10px;
+		border-top: 3px solid black;
 	}
 
 	.barInfo {
