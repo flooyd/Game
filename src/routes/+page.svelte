@@ -526,7 +526,7 @@
 		</div>
 		<div
 			class="player"
-			style="left: {player.x}px; top: {player.y}px; width: {player.width}px; height: {player.height}px;"
+			style="left: {player.x}px; top: {player.y}px; width: {player.width}px; height: {player.height}px; background-color: blue;"
 		></div>
 		{#each otherPlayers as otherPlayer}
 			<div class="playerName" style="left: {otherPlayer.x}px; top: {otherPlayer.y - 35}px;">
