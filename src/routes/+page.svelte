@@ -367,23 +367,23 @@ function updateOtherPlayers(deltaTime: number) {
 
             if (p0 && p1 && p2 && p3) {
                 const t = (targetTime - p1.time) / (p2.time - p1.time);
-                player.x = catmullRomInterpolation(p0.x, p1.x, p2.x, p3.x, t);
-								player.y = catmullRomInterpolation(p0.y, p1.y, p2.y, p3.y, t);
+                player.x = cubicHermiteInterpolation(p0.x, p1.x, p2.x, p3.x, t);
+                player.y = cubicHermiteInterpolation(p0.y, p1.y, p2.y, p3.y, t);
             }
         }
     });
 }
 
-function catmullRomInterpolation(p0: number, p1: number, p2: number, p3: number, t: number): number {
-        const t2 = t * t;
-        const t3 = t2 * t;
-        return 0.5 * (
-            (2 * p1) +
-            (-p0 + p2) * t +
-            (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 +
-            (-p0 + 3 * p1 - 3 * p2 + p3) * t3
-        );
-    }
+function cubicHermiteInterpolation(p0: number, p1: number, p2: number, p3: number, t: number): number {
+    const t2 = t * t;
+    const t3 = t2 * t;
+    const a = -0.5 * p0 + 1.5 * p1 - 1.5 * p2 + 0.5 * p3;
+    const b = p0 - 2.5 * p1 + 2 * p2 - 0.5 * p3;
+    const c = -0.5 * p0 + 0.5 * p2;
+    const d = p1;
+
+    return a * t3 + b * t2 + c * t + d;
+}
 
 	// Handle WASD movement
 	function move(deltaTime: number) {
