@@ -332,50 +332,62 @@
 
 	let lastUpdateTime = Date.now();
 
-	const INTERPOLATION_BUFFER_SIZE = 3;
-const INTERPOLATION_DELAY = 100; // ms
+	const INTERPOLATION_BUFFER_SIZE = 60;
+	const INTERPOLATION_DELAY = 16; // ms
 
-function updateOtherPlayers(deltaTime: number) {
-    const currentTime = Date.now();
+	function updateOtherPlayers(deltaTime: number) {
+		const currentTime = Date.now();
 
-    otherPlayers.forEach((player) => {
-        if (!player.positionBuffer) {
-            player.positionBuffer = [];
-        }
+		otherPlayers.forEach((player) => {
+			if (!player.positionBuffer) {
+				player.positionBuffer = [];
+			}
 
-        // Add current position to the buffer
-        player.positionBuffer.push({ x: player.x, y: player.y, time: currentTime });
+			// Add current position to the buffer
+			player.positionBuffer.push({ x: player.x, y: player.y, time: currentTime });
 
-        // Keep only the last INTERPOLATION_BUFFER_SIZE positions
-        if (player.positionBuffer.length > INTERPOLATION_BUFFER_SIZE) {
-            player.positionBuffer.shift();
-        }
+			// Keep only the last INTERPOLATION_BUFFER_SIZE positions
+			if (player.positionBuffer.length > INTERPOLATION_BUFFER_SIZE) {
+				player.positionBuffer.shift();
+			}
 
-        // Interpolate
-        if (player.positionBuffer.length >= 2) {
-            const targetTime = currentTime - INTERPOLATION_DELAY;
-            let i = player.positionBuffer.length - 1;
+			// Interpolate
+			if (player.positionBuffer.length >= 2) {
+				const targetTime = currentTime - INTERPOLATION_DELAY;
+				let i = player.positionBuffer.length - 1;
 
-            for (; i > 0; i--) {
-                if (player.positionBuffer[i].time <= targetTime) break;
-            }
+				for (; i > 0; i--) {
+					if (player.positionBuffer[i].time <= targetTime) break;
+				}
 
-            const p0 = player.positionBuffer[Math.max(0, i - 1)];
-            const p1 = player.positionBuffer[i];
+				const p0 = player.positionBuffer[Math.max(0, i - 1)];
+				const p1 = player.positionBuffer[i];
 
-            if (p0 && p1) {
-                const t = (targetTime - p0.time) / (p1.time - p0.time);
-                player.x = cubicInterpolation(p0.x, p1.x, t);
-                player.y = cubicInterpolation(p0.y, p1.y, t);
-            }
-        }
-    });
-}
+				if (p0 && p1) {
+					const t = (targetTime - p0.time) / (p1.time - p0.time);
+					player.x = catmullRomInterpolation(p0.x, p0.x, p1.x, p1.x, t);
+					player.y = catmullRomInterpolation(p0.y, p0.y, p1.y, p1.y, t);
+				}
+			}
+		});
+	}
 
-function cubicInterpolation(start: number, end: number, t: number): number {
-    const t2 = t * t;
-    const t3 = t2 * t;
-		return start * (1 - 3 * t2 + 2 * t3) + end * (3 * t2 - 2 * t3);
+	function catmullRomInterpolation(
+		p0: number,
+		p1: number,
+		p2: number,
+		p3: number,
+		t: number
+	): number {
+		const t2 = t * t;
+		const t3 = t2 * t;
+		return (
+			0.5 *
+			(2 * p1 +
+				(-p0 + p2) * t +
+				(2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 +
+				(-p0 + 3 * p1 - 3 * p2 + p3) * t3)
+		);
 	}
 
 	// Handle WASD movement
