@@ -289,7 +289,7 @@
 
 		if (player) {
 			// Update player position
-			if (time - lastPlayerUpdate >= 1000 / 144 && shouldUpdatePlayer) {
+			if (time - lastPlayerUpdate >= 1000 / 60 && shouldUpdatePlayer) {
 				lastPlayerUpdate = time;
 				socket?.emit('PlayerMove', player);
 				shouldUpdatePlayer = false;
@@ -332,8 +332,8 @@
 
 	let lastUpdateTime = Date.now();
 
-	const INTERPOLATION_BUFFER_SIZE = 120; // Increased buffer size for smoother interpolation
-	const INTERPOLATION_DELAY = 1000 / 120; // ms
+	const INTERPOLATION_BUFFER_SIZE = 3; // Increased buffer size for smoother interpolation
+	const INTERPOLATION_DELAY = 1000 / 60; // ms
 
 	function updateOtherPlayers(deltaTime: number) {
 		const currentTime = Date.now();
