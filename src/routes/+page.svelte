@@ -655,6 +655,7 @@
 		align-items: center;
 		padding: 10px;
 		border-bottom: 3px solid black;
+		z-index: 1002;
 	}
 
 	.bottomBar {
@@ -669,6 +670,7 @@
 		align-items: center;
 		padding: 10px;
 		border-top: 3px solid black;
+		z-index: 1002;
 	}
 
 	.barInfo {
