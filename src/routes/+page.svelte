@@ -326,51 +326,52 @@
 		requestAnimationFrame(loop);
 	}
 
-	function lerp(start: number, end: number, t: number) {
-		return start + (end - start) * t;
-	}
-
 	let lastUpdateTime = Date.now();
 
 	const INTERPOLATION_BUFFER_SIZE = 3; // Increased buffer size for smoother interpolation
 	const INTERPOLATION_DELAY = 1000 / 60; // ms
 
 	function updateOtherPlayers(deltaTime: number) {
-		const currentTime = Date.now();
-
+		//update without interpolation
 		otherPlayers.forEach((player) => {
-			if (!player.positionBuffer) {
-				player.positionBuffer = [];
-			}
+			player.x = player.x + (player.x - player.prevX) * deltaTime;
+			player.y = player.y + (player.y - player.prevY) * deltaTime;
+		});
+		// const currentTime = Date.now();
 
-			// Add current position to the buffer
-			player.positionBuffer.push({ x: player.x, y: player.y, time: currentTime });
+		// otherPlayers.forEach((player) => {
+		// 	if (!player.positionBuffer) {
+		// 		player.positionBuffer = [];
+		// 	}
 
-			// Keep only the last INTERPOLATION_BUFFER_SIZE positions
-			while (player.positionBuffer.length > INTERPOLATION_BUFFER_SIZE) {
-				player.positionBuffer.shift();
-			}
+		// 	// Add current position to the buffer
+		// 	player.positionBuffer.push({ x: player.x, y: player.y, time: currentTime });
 
-			// Interpolate
-			if (player.positionBuffer.length >= 2) {
-				const targetTime = currentTime - INTERPOLATION_DELAY;
-				let i = player.positionBuffer.length - 1;
+		// 	// Keep only the last INTERPOLATION_BUFFER_SIZE positions
+		// 	while (player.positionBuffer.length > INTERPOLATION_BUFFER_SIZE) {
+		// 		player.positionBuffer.shift();
+		// 	}
 
-				for (; i > 0; i--) {
-					if (player.positionBuffer[i].time <= targetTime) break;
-				}
+		// 	// Interpolate
+		// 	if (player.positionBuffer.length >= 2) {
+		// 		const targetTime = currentTime - INTERPOLATION_DELAY;
+		// 		let i = player.positionBuffer.length - 1;
 
-				const p0 = player.positionBuffer[Math.max(0, i - 1)];
-				const p1 = player.positionBuffer[i];
-				const p2 = player.positionBuffer[Math.min(player.positionBuffer.length - 1, i + 1)];
-				const p3 = player.positionBuffer[Math.min(player.positionBuffer.length - 1, i + 2)];
+		// 		for (; i > 0; i--) {
+		// 			if (player.positionBuffer[i].time <= targetTime) break;
+		// 		}
 
-				if (p0 && p1 && p2 && p3) {
-					const t = (targetTime - p1.time) / (p2.time - p1.time);
-					player.x = cubicHermiteInterpolation(p0.x, p1.x, p2.x, p3.x, t);
-					player.y = cubicHermiteInterpolation(p0.y, p1.y, p2.y, p3.y, t);
-				}
-			}
+		// 		const p0 = player.positionBuffer[Math.max(0, i - 1)];
+		// 		const p1 = player.positionBuffer[i];
+		// 		const p2 = player.positionBuffer[Math.min(player.positionBuffer.length - 1, i + 1)];
+		// 		const p3 = player.positionBuffer[Math.min(player.positionBuffer.length - 1, i + 2)];
+
+		// 		if (p0 && p1 && p2 && p3) {
+		// 			const t = (targetTime - p1.time) / (p2.time - p1.time);
+		// 			player.x = cubicHermiteInterpolation(p0.x, p1.x, p2.x, p3.x, t);
+		// 			player.y = cubicHermiteInterpolation(p0.y, p1.y, p2.y, p3.y, t);
+		// 		}
+		// 	}
 		});
 	}
 
