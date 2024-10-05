@@ -213,6 +213,7 @@
 		});
 
 		socket.on('OtherPlayerMoved', (data) => {
+			console.log('OtherPlayerMoved', data);
 			let otherPlayer = otherPlayers.find((p) => p.id === data.id);
 			otherPlayers = otherPlayers.map((p) =>
 				p.id === data.id ? { ...p, x: data.x, y: data.y, prevX: p.x, prevyY: p.y } : p
@@ -367,8 +368,8 @@
 					player.y = cubicHermiteInterpolation(p0.y, p1.y, p2.y, p3.y, t);
 				}
 			}
-	});
-}
+		});
+	}
 
 	function cubicHermiteInterpolation(
 		p0: number,
