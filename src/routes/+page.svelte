@@ -336,7 +336,7 @@
 
 	// Update other players
 	function updateOtherPlayers(deltaTime: number) {
-		const interpolationSpeed = 0.5; // Adjust this value to control how quickly players reach their target position
+		const interpolationSpeed = 30; // Adjust this value to control how quickly players reach their target position
 		const threshold = 0.1; // Minimum distance to interpolate
 
 		otherPlayers = otherPlayers.map((p) => {
