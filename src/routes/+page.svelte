@@ -372,7 +372,6 @@
 		// 			player.y = cubicHermiteInterpolation(p0.y, p1.y, p2.y, p3.y, t);
 		// 		}
 		// 	}
-		});
 	}
 
 	function cubicHermiteInterpolation(
