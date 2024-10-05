@@ -330,7 +330,7 @@
 	let lastUpdateTime = Date.now();
 
 	const INTERPOLATION_BUFFER_SIZE = 3; // Increased buffer size for smoother interpolation
-	const INTERPOLATION_DELAY = 1000 / 24; // ms
+	const INTERPOLATION_DELAY = 1000 / 10; // ms
 
 	function updateOtherPlayers(deltaTime: number) {
 		const currentTime = Date.now();
