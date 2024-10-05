@@ -327,48 +327,59 @@
 		requestAnimationFrame(loop);
 	}
 
-	let lastUpdateTime = Date.now();
-
-	const INTERPOLATION_BUFFER_SIZE = 60; // Increased buffer size for smoother interpolation
+	const INTERPOLATION_BUFFER_SIZE = 10; // Increased buffer size for smoother interpolation
 	const INTERPOLATION_DELAY = 1000 / 60; // ms
 
 	function updateOtherPlayers(deltaTime: number) {
-		const currentTime = Date.now();
-
-		otherPlayers.forEach((player) => {
-			if (!player.positionBuffer) {
-				player.positionBuffer = [];
-			}
-
-			// Add current position to the buffer
-			player.positionBuffer.push({ x: player.x, y: player.y, time: currentTime });
-
-			// Keep only the last INTERPOLATION_BUFFER_SIZE positions
-			while (player.positionBuffer.length > INTERPOLATION_BUFFER_SIZE) {
-				player.positionBuffer.shift();
-			}
-
-			// Interpolate
-			if (player.positionBuffer.length >= 2) {
-				const targetTime = currentTime - INTERPOLATION_DELAY;
-				let i = player.positionBuffer.length - 1;
-
-				for (; i > 0; i--) {
-					if (player.positionBuffer[i].time <= targetTime) break;
-				}
-
-				const p0 = player.positionBuffer[Math.max(0, i - 1)];
-				const p1 = player.positionBuffer[i];
-				const p2 = player.positionBuffer[Math.min(player.positionBuffer.length - 1, i + 1)];
-				const p3 = player.positionBuffer[Math.min(player.positionBuffer.length - 1, i + 2)];
-
-				if (p0 && p1 && p2 && p3) {
-					const t = (targetTime - p1.time) / (p2.time - p1.time);
-					player.x = cubicHermiteInterpolation(p0.x, p1.x, p2.x, p3.x, t);
-					player.y = cubicHermiteInterpolation(p0.y, p1.y, p2.y, p3.y, t);
-				}
+		//update without interpolation
+		otherPlayers.forEach((p) => {
+			if (p.prevX && p.prevY) {
+				const dx = p.x - p.prevX;
+				const dy = p.y - p.prevY;
+				const distance = Math.sqrt(dx * dx + dy * dy);
+				const speed = distance / deltaTime;
+				const maxSpeed = 0.5;
+				const ratio = Math.min(maxSpeed / speed, 1);
+				p.x = p.prevX + dx * ratio;
+				p.y = p.prevY + dy * ratio;
 			}
 		});
+		// const currentTime = Date.now();
+
+		// otherPlayers.forEach((player) => {
+		// 	if (!player.positionBuffer) {
+		// 		player.positionBuffer = [];
+		// 	}
+
+		// 	// Add current position to the buffer
+		// 	player.positionBuffer.push({ x: player.x, y: player.y, time: currentTime });
+
+		// 	// Keep only the last INTERPOLATION_BUFFER_SIZE positions
+		// 	while (player.positionBuffer.length > INTERPOLATION_BUFFER_SIZE) {
+		// 		player.positionBuffer.shift();
+		// 	}
+
+		// 	// Interpolate
+		// 	if (player.positionBuffer.length >= 2) {
+		// 		const targetTime = currentTime - INTERPOLATION_DELAY;
+		// 		let i = player.positionBuffer.length - 1;
+
+		// 		for (; i > 0; i--) {
+		// 			if (player.positionBuffer[i].time <= targetTime) break;
+		// 		}
+
+		// 		const p0 = player.positionBuffer[Math.max(0, i - 1)];
+		// 		const p1 = player.positionBuffer[i];
+		// 		const p2 = player.positionBuffer[Math.min(player.positionBuffer.length - 1, i + 1)];
+		// 		const p3 = player.positionBuffer[Math.min(player.positionBuffer.length - 1, i + 2)];
+
+		// 		if (p0 && p1 && p2 && p3) {
+		// 			const t = (targetTime - p1.time) / (p2.time - p1.time);
+		// 			player.x = cubicHermiteInterpolation(p0.x, p1.x, p2.x, p3.x, t);
+		// 			player.y = cubicHermiteInterpolation(p0.y, p1.y, p2.y, p3.y, t);
+		// 		}
+		// 	}
+		// });
 	}
 
 	function cubicHermiteInterpolation(
