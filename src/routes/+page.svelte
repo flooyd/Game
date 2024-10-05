@@ -289,7 +289,7 @@
 
 		if (player) {
 			// Update player position
-			if (time - lastPlayerUpdate >= 1000 / 144 && shouldUpdatePlayer) {
+			if (time - lastPlayerUpdate >= 1000 / 24 && shouldUpdatePlayer) {
 				lastPlayerUpdate = time;
 				socket?.emit('PlayerMove', player);
 				shouldUpdatePlayer = false;
