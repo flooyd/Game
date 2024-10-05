@@ -214,9 +214,16 @@
 
 		socket.on('OtherPlayerMoved', (data) => {
 			console.log('OtherPlayerMoved', data);
-			let otherPlayer = otherPlayers.find((p) => p.id === data.id);
 			otherPlayers = otherPlayers.map((p) =>
-				p.id === data.id ? { ...p, x: data.x, y: data.y, prevX: p.x, prevyY: p.y } : p
+				p.id === data.id
+					? {
+							...p,
+							prevX: p.prevX !== undefined ? p.prevX : p.x,
+							prevY: p.prevY !== undefined ? p.prevY : p.y,
+							x: data.x,
+							y: data.y
+						}
+					: p
 			);
 		});
 
@@ -327,63 +334,35 @@
 		requestAnimationFrame(loop);
 	}
 
-	const INTERPOLATION_BUFFER_SIZE = 10; // Increased buffer size for smoother interpolation
-	const INTERPOLATION_DELAY = 1000 / 150; // ms
-
+	// Update other players
 	function updateOtherPlayers(deltaTime: number) {
-		const currentTime = Date.now();
+		const interpolationSpeed = 10; // Adjust this value to control how quickly players reach their target position
+		const threshold = 0.1; // Minimum distance to interpolate
 
-		otherPlayers.forEach((player) => {
-			if (!player.positionBuffer) {
-				player.positionBuffer = [];
-			}
+		otherPlayers = otherPlayers.map((p) => {
+			if (p.prevX !== undefined && p.prevY !== undefined) {
+				const dx = p.x - p.prevX;
+				const dy = p.y - p.prevY;
+				const distance = Math.sqrt(dx * dx + dy * dy);
 
-			// Add current position to the buffer
-			player.positionBuffer.push({ x: player.x, y: player.y, time: currentTime });
+				if (distance > threshold) {
+					const maxStep = interpolationSpeed * (deltaTime / 1000); // Maximum distance to move this frame
+					const step = Math.min(maxStep, distance); // Don't overshoot the target
+					const ratio = step / distance;
 
-			// Keep only the last INTERPOLATION_BUFFER_SIZE positions
-			while (player.positionBuffer.length > INTERPOLATION_BUFFER_SIZE) {
-				player.positionBuffer.shift();
-			}
-
-			// Interpolate
-			if (player.positionBuffer.length >= 2) {
-				const targetTime = currentTime - INTERPOLATION_DELAY;
-				let i = player.positionBuffer.length - 1;
-
-				for (; i > 0; i--) {
-					if (player.positionBuffer[i].time <= targetTime) break;
-				}
-
-				const p0 = player.positionBuffer[Math.max(0, i - 1)];
-				const p1 = player.positionBuffer[i];
-				const p2 = player.positionBuffer[Math.min(player.positionBuffer.length - 1, i + 1)];
-				const p3 = player.positionBuffer[Math.min(player.positionBuffer.length - 1, i + 2)];
-
-				if (p0 && p1 && p2 && p3) {
-					const t = (targetTime - p1.time) / (p2.time - p1.time);
-					player.x = cubicHermiteInterpolation(p0.x, p1.x, p2.x, p3.x, t);
-					player.y = cubicHermiteInterpolation(p0.y, p1.y, p2.y, p3.y, t);
+					p.prevX += dx * ratio;
+					p.prevY += dy * ratio;
+				} else {
+					p.prevX = p.x;
+					p.prevY = p.y;
 				}
 			}
+			return p;
 		});
 	}
 
-	function cubicHermiteInterpolation(
-		p0: number,
-		p1: number,
-		p2: number,
-		p3: number,
-		t: number
-	): number {
-		const t2 = t * t;
-		const t3 = t2 * t;
-		const a = -0.5 * p0 + 1.5 * p1 - 1.5 * p2 + 0.5 * p3;
-		const b = p0 - 2.5 * p1 + 2 * p2 - 0.5 * p3;
-		const c = -0.5 * p0 + 0.5 * p2;
-		const d = p1;
-
-		return a * t3 + b * t2 + c * t + d;
+	function lerp(start: number, end: number, t: number): number {
+		return start * (1 - t) + end * t;
 	}
 
 	// Handle WASD movement
