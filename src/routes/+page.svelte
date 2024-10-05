@@ -212,7 +212,7 @@
 			console.log('OtherPlayerDisconnected', data);
 		});
 
-		socket.on('OtherPlayerMove', (data) => {
+		socket.on('OtherPlayerMoved', (data) => {
 			let otherPlayer = otherPlayers.find((p) => p.id === data.id);
 			otherPlayers = otherPlayers.map((p) =>
 				p.id === data.id ? { ...p, x: data.x, y: data.y, prevX: p.x, prevyY: p.y } : p
