@@ -289,7 +289,7 @@
 
 		if (player) {
 			// Update player position
-			if (time - lastPlayerUpdate >= 1000 / 24 && shouldUpdatePlayer) {
+			if (time - lastPlayerUpdate >= 1000 / 60 && shouldUpdatePlayer) {
 				lastPlayerUpdate = time;
 				socket?.emit('PlayerMove', player);
 				shouldUpdatePlayer = false;
@@ -326,12 +326,65 @@
 		requestAnimationFrame(loop);
 	}
 
+	let lastUpdateTime = Date.now();
+
+	const INTERPOLATION_BUFFER_SIZE = 3; // Increased buffer size for smoother interpolation
+	const INTERPOLATION_DELAY = 1000 / 24; // ms
+
 	function updateOtherPlayers(deltaTime: number) {
-		//update without interpolation
+		const currentTime = Date.now();
+
 		otherPlayers.forEach((player) => {
-			player.x = player.x + (player.x - player.prevX) * deltaTime;
-			player.y = player.y + (player.y - player.prevY) * deltaTime;
-		});
+			if (!player.positionBuffer) {
+				player.positionBuffer = [];
+			}
+
+			// Add current position to the buffer
+			player.positionBuffer.push({ x: player.x, y: player.y, time: currentTime });
+
+			// Keep only the last INTERPOLATION_BUFFER_SIZE positions
+			while (player.positionBuffer.length > INTERPOLATION_BUFFER_SIZE) {
+				player.positionBuffer.shift();
+			}
+
+			// Interpolate
+			if (player.positionBuffer.length >= 2) {
+				const targetTime = currentTime - INTERPOLATION_DELAY;
+				let i = player.positionBuffer.length - 1;
+
+				for (; i > 0; i--) {
+					if (player.positionBuffer[i].time <= targetTime) break;
+				}
+
+				const p0 = player.positionBuffer[Math.max(0, i - 1)];
+				const p1 = player.positionBuffer[i];
+				const p2 = player.positionBuffer[Math.min(player.positionBuffer.length - 1, i + 1)];
+				const p3 = player.positionBuffer[Math.min(player.positionBuffer.length - 1, i + 2)];
+
+				if (p0 && p1 && p2 && p3) {
+					const t = (targetTime - p1.time) / (p2.time - p1.time);
+					player.x = cubicHermiteInterpolation(p0.x, p1.x, p2.x, p3.x, t);
+					player.y = cubicHermiteInterpolation(p0.y, p1.y, p2.y, p3.y, t);
+				}
+			}
+	});
+}
+
+	function cubicHermiteInterpolation(
+		p0: number,
+		p1: number,
+		p2: number,
+		p3: number,
+		t: number
+	): number {
+		const t2 = t * t;
+		const t3 = t2 * t;
+		const a = -0.5 * p0 + 1.5 * p1 - 1.5 * p2 + 0.5 * p3;
+		const b = p0 - 2.5 * p1 + 2 * p2 - 0.5 * p3;
+		const c = -0.5 * p0 + 0.5 * p2;
+		const d = p1;
+
+		return a * t3 + b * t2 + c * t + d;
 	}
 
 	// Handle WASD movement
