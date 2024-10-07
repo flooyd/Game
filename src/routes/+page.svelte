@@ -242,23 +242,26 @@
 	}
 
 	function updateplayers(deltaTime: number) {
-		//interpolate player positions
 		players.forEach((p) => {
-			if (p.positionBuffer?.length > 1) {
-				console.log(p.positionBuffer);
-				const time = Date.now();
-				const lastPosition = p.positionBuffer[0];
-				const nextPosition = p.positionBuffer[1];
-				const timeDiff = nextPosition.time - lastPosition.time;
-				const timeRatio = (time - lastPosition.time) / timeDiff;
-				const x = lastPosition.x + (nextPosition.x - lastPosition.x) * timeRatio;
-				const y = lastPosition.y + (nextPosition.y - lastPosition.y) * timeRatio;
-				p.x = x;
-				p.y = y;
+			if (p.positionBuffer.length > 0) {
+				const lastPosition = p.positionBuffer[p.positionBuffer.length - 1];
+				const timeSinceLastPosition = Date.now() - lastPosition.time;
+				if (timeSinceLastPosition < 1000) {
+					const dx = lastPosition.x - p.x;
+					const dy = lastPosition.y - p.y;
+					const length = Math.sqrt(dx * dx + dy * dy);
+					if (length > 5) {
+						p.x += (dx / length) * p.speed * deltaTime;
+						p.y += (dy / length) * p.speed * deltaTime;
+					}
+				}
 
-				p.positionBuffer = p.positionBuffer.filter((p: { time: number; }) => p.time > time);
+				p.positionBuffer = p.positionBuffer.filter(
+					(pos: { time: number }) => Date.now() - pos.time < 1000
+				);
 			}
 		});
+
 		players = players;
 	}
 
