@@ -243,7 +243,7 @@
 	}
 
 	function updateplayers(deltaTime: number) {
-		players = players.map((p) => {
+		players.forEach((p) => {
 			if (p.positionBuffer.length > 0) {
 				const lastPosition = p.positionBuffer[p.positionBuffer.length - 1];
 				const timeSinceLastPosition = Date.now() - lastPosition.time;
@@ -251,18 +251,12 @@
 					const dx = lastPosition.x - p.x;
 					const dy = lastPosition.y - p.y;
 					const length = Math.sqrt(dx * dx + dy * dy);
-					console.log(`Player ID: ${p.id}`);
-					console.log(`Current Position: (${p.x}, ${p.y})`);
-					console.log(`Last Position: (${lastPosition.x}, ${lastPosition.y})`);
-					console.log(`dx: ${dx}, dy: ${dy}`);
-					console.log(length);
-					if (length > 0.5) {
+					if (length > 0) {
 						p.x += (dx / length) * p.speed * deltaTime;
 						p.y += (dy / length) * p.speed * deltaTime;
 					}
 				}
 			}
-			return p;
 		});
 
 		players = players;
