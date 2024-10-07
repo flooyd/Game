@@ -243,6 +243,7 @@
 
 	function updateplayers(deltaTime: number) {
 		players.forEach((p) => {
+			console.log(p.positionBuffer);
 			if (p.positionBuffer.length > 0) {
 				const lastPosition = p.positionBuffer[p.positionBuffer.length - 1];
 				const timeSinceLastPosition = Date.now() - lastPosition.time;
@@ -256,7 +257,9 @@
 					}
 				}
 
-				p.positionBuffer = p.positionBuffer.filter((pos: { time: number; }) => Date.now() - pos.time < 1000);
+				p.positionBuffer = p.positionBuffer.filter(
+					(pos: { time: number }) => Date.now() - pos.time < 1000
+				);
 			}
 		});
 
