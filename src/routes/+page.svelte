@@ -242,8 +242,7 @@
 	}
 
 	function updateplayers(deltaTime: number) {
-		players.forEach((p) => {
-			console.log(p.positionBuffer);
+		players = players.map((p) => {
 			if (p.positionBuffer.length > 0) {
 				const lastPosition = p.positionBuffer[p.positionBuffer.length - 1];
 				const timeSinceLastPosition = Date.now() - lastPosition.time;
@@ -257,6 +256,7 @@
 					}
 				}
 			}
+			return p;
 		});
 
 		players = players;
