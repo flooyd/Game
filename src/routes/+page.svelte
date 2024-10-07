@@ -155,7 +155,7 @@
 			const player = players.find((p) => p.name === data.name);
 			if (player) {
 				player.positionBuffer.push({ x: data.x, y: data.y, time: Date.now() });
-				if (player.positionBuffer.length > 5) {
+				if (player.positionBuffer.length > 10) {
 					player.positionBuffer.shift();
 				}
 			}
@@ -256,9 +256,7 @@
 					}
 				}
 
-				p.positionBuffer = p.positionBuffer.filter(
-					(pos: { time: number }) => Date.now() - pos.time < 1000
-				);
+				p.positionBuffer = p.positionBuffer.filter((pos: { time: number; }) => Date.now() - pos.time < 1000);
 			}
 		});
 
