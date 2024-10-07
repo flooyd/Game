@@ -225,7 +225,7 @@
 				const dx = mousePosition.x - player.x;
 				const dy = mousePosition.y - player.y;
 				const length = Math.sqrt(dx * dx + dy * dy);
-				if (length > 0) {
+				if (length > 1) {
 					player.x += (dx / length) * player.speed * deltaTime;
 					player.y += (dy / length) * player.speed * deltaTime;
 					shouldUpdatePlayer = true;
