@@ -138,10 +138,11 @@
 		});
 
 		$socket.on('ExistingPlayers', (data) => {
-			players = data;
+			players = data.map((p) => ({ ...p, positionBuffer: [] }));
 		});
 
 		$socket.on('OtherPlayerConnected', (data) => {
+			data.positionBuffer = [];
 			players.push(data);
 			players = players;
 		});
@@ -153,18 +154,9 @@
 		$socket.on('OtherPlayerMoved', (data) => {
 			const player = players.find((p) => p.name === data.name);
 			if (player) {
-				if (!player.positionBuffer) {
-					player.positionBuffer = [];
-				}
-				player.positionBuffer = [
-					...player.positionBuffer,
-					{ x: data.x, y: data.y, time: Date.now() }
-				];
-				console.log(player.positionBuffer);
-				// Limit buffer size to prevent memory issues
-				const maxBufferSize = 10;
-				if (player.positionBuffer.length > maxBufferSize) {
-					player.positionBuffer = player.positionBuffer.slice(-maxBufferSize);
+				player.positionBuffer.push({ x: data.x, y: data.y, time: Date.now() });
+				if (player.positionBuffer.length > 5) {
+					player.positionBuffer.shift();
 				}
 			}
 		});
@@ -252,17 +244,21 @@
 	function updateplayers(deltaTime: number) {
 		//interpolate player positions
 		players.forEach((p) => {
-			if (p.positionBuffer.length > 0) {
+			if (p.positionBuffer?.length > 1) {
+				console.log(p.positionBuffer);
+				const time = Date.now();
 				const lastPosition = p.positionBuffer[0];
 				const nextPosition = p.positionBuffer[1];
-				const timeSinceLastUpdate = Date.now() - lastPosition.time;
-				const timeToNextUpdate = nextPosition.time - lastPosition.time;
-				const timeRatio = timeSinceLastUpdate / timeToNextUpdate;
-				p.x = lastPosition.x + (nextPosition.x - lastPosition.x) * timeRatio;
-				p.y = lastPosition.y + (nextPosition.y - lastPosition.y) * timeRatio;
+				const timeDiff = nextPosition.time - lastPosition.time;
+				const timeRatio = (time - lastPosition.time) / timeDiff;
+				const x = lastPosition.x + (nextPosition.x - lastPosition.x) * timeRatio;
+				const y = lastPosition.y + (nextPosition.y - lastPosition.y) * timeRatio;
+				p.x = x;
+				p.y = y;
+
+				p.positionBuffer = p.positionBuffer.filter((p) => p.time > time);
 			}
 		});
-
 		players = players;
 	}
 
