@@ -153,6 +153,7 @@
 
 		$socket.on('OtherPlayerMoved', (data) => {
 			const player = players.find((p) => p.name === data.name);
+			console.log('OtherPlayerMoved', data);
 			if (player) {
 				player.positionBuffer.push({ x: data.x, y: data.y, time: Date.now() });
 				if (player.positionBuffer.length > 10) {
