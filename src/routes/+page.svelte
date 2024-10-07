@@ -151,13 +151,17 @@
 		});
 
 		$socket.on('OtherPlayerMoved', (data) => {
-			//add to buffer, create buffer first if it doesn't exist
 			const player = players.find((p) => p.name === data.name);
 			if (player) {
-				if (player.positionBuffer) {
-					player.positionBuffer.push({ x: data.x, y: data.y });
-				} else {
-					player.positionBuffer = [{ x: data.x, y: data.y }];
+				if (!player.positionBuffer) {
+					player.positionBuffer = [];
+				}
+				player.positionBuffer = [...player.positionBuffer, { x: data.x, y: data.y }];
+				console.log(player.positionBuffer);
+				// Limit buffer size to prevent memory issues
+				const maxBufferSize = 10;
+				if (player.positionBuffer.length > maxBufferSize) {
+					player.positionBuffer = player.positionBuffer.slice(-maxBufferSize);
 				}
 			}
 		});
@@ -231,8 +235,9 @@
 					player.y += (dy / length) * player.speed * deltaTime;
 					shouldUpdatePlayer = true;
 				}
-				centerView();
 			}
+
+			centerView();
 		}
 
 		updateplayers(deltaTime);
@@ -242,32 +247,25 @@
 	}
 
 	function updateplayers(deltaTime: number) {
-		players = players.map((p) => {
-			if (p.positionBuffer && p.positionBuffer.length > 2) {
-				const buffer = p.positionBuffer;
-				const time = 0.1;
-				const t = Math.min(1, deltaTime / time);
-				const x = catmullRomInterpolation(buffer[0].x, buffer[0].x, buffer[1].x, buffer[2].x, t);
-				const y = catmullRomInterpolation(buffer[0].y, buffer[0].y, buffer[1].y, buffer[2].y, t);
-				if (t === 1) {
-					buffer.shift();
+		players.forEach((player) => {
+			if (player.positionBuffer && player.positionBuffer.length > 0) {
+				const targetPosition = player.positionBuffer[0];
+				const dx = targetPosition.x - player.x;
+				const dy = targetPosition.y - player.y;
+				const distance = Math.sqrt(dx * dx + dy * dy);
+				console.log(distance);
+				if (distance > 1) {
+					player.x += dx;
+					player.y += dy;
+				} else {
+					player.x = targetPosition.x;
+					player.y = targetPosition.y;
+					player.positionBuffer.shift();
 				}
-				return { ...p, x, y, positionBuffer: buffer };
 			}
-			return p;
 		});
-	}
 
-	function catmullRomInterpolation(p0: number, p1: number, p2: number, p3: number, t: number) {
-		const v0 = (p2 - p0) * 0.5;
-		const v1 = (p3 - p1) * 0.5;
-		const t2 = t * t;
-		const t3 = t * t2;
-		const a = 2 * t3 - 3 * t2 + 1;
-		const b = t3 - 2 * t2 + t;
-		const c = t3 - t2;
-		const d = -2 * t3 + 3 * t2;
-		return a * p1 + b * v0 + c * v1 + d * p2;
+		players = players;
 	}
 
 	function move(deltaTime: number) {
