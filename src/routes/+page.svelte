@@ -225,11 +225,11 @@
 				const dx = mousePosition.x - player.x;
 				const dy = mousePosition.y - player.y;
 				const length = Math.sqrt(dx * dx + dy * dy);
-				if (length > 1) {
+				//move until player is within 5px of mouse position
+				if (length > 5) {
 					player.x += (dx / length) * player.speed * deltaTime;
 					player.y += (dy / length) * player.speed * deltaTime;
 					shouldUpdatePlayer = true;
-				}
 			}
 			centerView();
 		}
