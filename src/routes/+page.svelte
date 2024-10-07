@@ -213,7 +213,7 @@
 		}
 
 		if (player) {
-			if (time - lastPlayerUpdate >= 1000 / 144 && shouldUpdatePlayer) {
+			if (time - lastPlayerUpdate >= 1000 / 60 && shouldUpdatePlayer) {
 				lastPlayerUpdate = time;
 				$socket?.emit('PlayerMove', player);
 				shouldUpdatePlayer = false;
