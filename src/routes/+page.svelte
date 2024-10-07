@@ -256,10 +256,6 @@
 						p.y += (dy / length) * p.speed * deltaTime;
 					}
 				}
-
-				p.positionBuffer = p.positionBuffer.filter(
-					(pos: { time: number }) => Date.now() - pos.time < 1000
-				);
 			}
 		});
 
