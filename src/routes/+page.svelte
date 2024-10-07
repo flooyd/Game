@@ -247,10 +247,13 @@
 				const lastPosition = p.positionBuffer[p.positionBuffer.length - 1];
 				const timeSinceLastPosition = Date.now() - lastPosition.time;
 				if (timeSinceLastPosition < 1000) {
-					console.log('blah blah blah');
 					const dx = lastPosition.x - p.x;
 					const dy = lastPosition.y - p.y;
 					const length = Math.sqrt(dx * dx + dy * dy);
+					console.log(`Player ID: ${p.id}`);
+					console.log(`Current Position: (${p.x}, ${p.y})`);
+					console.log(`Last Position: (${lastPosition.x}, ${lastPosition.y})`);
+					console.log(`dx: ${dx}, dy: ${dy}`);
 					console.log(length);
 					if (length > 0.5) {
 						p.x += (dx / length) * p.speed * deltaTime;
