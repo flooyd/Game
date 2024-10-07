@@ -230,8 +230,9 @@
 					player.x += (dx / length) * player.speed * deltaTime;
 					player.y += (dy / length) * player.speed * deltaTime;
 					shouldUpdatePlayer = true;
+				}
+				centerView();
 			}
-			centerView();
 		}
 
 		updateplayers(deltaTime);
