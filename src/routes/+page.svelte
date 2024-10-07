@@ -251,6 +251,7 @@
 					const dx = lastPosition.x - p.x;
 					const dy = lastPosition.y - p.y;
 					const length = Math.sqrt(dx * dx + dy * dy);
+					console.log(length);
 					if (length > 1) {
 						p.x += (dx / length) * p.speed * deltaTime;
 						p.y += (dy / length) * p.speed * deltaTime;
