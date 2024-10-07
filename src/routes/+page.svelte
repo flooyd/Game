@@ -156,7 +156,10 @@
 				if (!player.positionBuffer) {
 					player.positionBuffer = [];
 				}
-				player.positionBuffer = [...player.positionBuffer, { x: data.x, y: data.y }];
+				player.positionBuffer = [
+					...player.positionBuffer,
+					{ x: data.x, y: data.y, time: Date.now() }
+				];
 				console.log(player.positionBuffer);
 				// Limit buffer size to prevent memory issues
 				const maxBufferSize = 10;
@@ -247,21 +250,16 @@
 	}
 
 	function updateplayers(deltaTime: number) {
-		players.forEach((player) => {
-			if (player.positionBuffer && player.positionBuffer.length > 0) {
-				const targetPosition = player.positionBuffer[0];
-				const dx = targetPosition.x - player.x;
-				const dy = targetPosition.y - player.y;
-				const distance = Math.sqrt(dx * dx + dy * dy);
-				console.log(distance);
-				if (distance > 1) {
-					player.x += dx;
-					player.y += dy;
-				} else {
-					player.x = targetPosition.x;
-					player.y = targetPosition.y;
-					player.positionBuffer.shift();
-				}
+		//interpolate player positions
+		players.forEach((p) => {
+			if (p.positionBuffer.length > 0) {
+				const lastPosition = p.positionBuffer[0];
+				const nextPosition = p.positionBuffer[1];
+				const timeSinceLastUpdate = Date.now() - lastPosition.time;
+				const timeToNextUpdate = nextPosition.time - lastPosition.time;
+				const timeRatio = timeSinceLastUpdate / timeToNextUpdate;
+				p.x = lastPosition.x + (nextPosition.x - lastPosition.x) * timeRatio;
+				p.y = lastPosition.y + (nextPosition.y - lastPosition.y) * timeRatio;
 			}
 		});
 
