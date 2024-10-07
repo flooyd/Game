@@ -143,6 +143,7 @@
 
 		$socket.on('OtherPlayerConnected', (data) => {
 			data.positionBuffer = [];
+			data.speed = data.speed || 0.5;
 			players.push(data);
 			players = players;
 		});
@@ -251,7 +252,7 @@
 					const dx = lastPosition.x - p.x;
 					const dy = lastPosition.y - p.y;
 					const length = Math.sqrt(dx * dx + dy * dy);
-					if (length > 0) {
+					if (length > 5) {
 						p.x += (dx / length) * p.speed * deltaTime;
 						p.y += (dy / length) * p.speed * deltaTime;
 					}
