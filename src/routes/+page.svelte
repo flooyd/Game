@@ -245,7 +245,7 @@
 		players = players.map((p) => {
 			if (p.positionBuffer && p.positionBuffer.length > 2) {
 				const buffer = p.positionBuffer;
-				const time = 1;
+				const time = 1000 / 144;
 				const t = Math.min(1, deltaTime / time);
 				const x = catmullRomInterpolation(buffer[0].x, buffer[0].x, buffer[1].x, buffer[2].x, t);
 				const y = catmullRomInterpolation(buffer[0].y, buffer[0].y, buffer[1].y, buffer[2].y, t);
