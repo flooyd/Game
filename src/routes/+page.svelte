@@ -248,7 +248,7 @@
 	}
 
 	function updateplayers(deltaTime: number) {
-		const interpolationFactor = 0.5; // Adjust for smoother interpolation
+		const interpolationFactor = 0.25; // Adjust for smoother interpolation
 
 		players.forEach((p) => {
 			if (p.positionBuffer.length > 0) {
