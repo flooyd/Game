@@ -243,18 +243,26 @@
 		requestAnimationFrame(loop);
 	}
 
+	function lerp(start: number, end: number, t: number): number {
+		return start + (end - start) * t;
+	}
+
 	function updateplayers(deltaTime: number) {
+		const interpolationFactor = 0.1; // Adjust for smoother interpolation
+
 		players.forEach((p) => {
 			if (p.positionBuffer.length > 0) {
 				const lastPosition = p.positionBuffer[p.positionBuffer.length - 1];
 				const timeSinceLastPosition = Date.now() - lastPosition.time;
+
 				if (timeSinceLastPosition < 1000) {
 					const dx = lastPosition.x - p.x;
 					const dy = lastPosition.y - p.y;
 					const length = Math.sqrt(dx * dx + dy * dy);
-					if (length > 5) {
-						p.x += (dx / length) * p.speed * deltaTime;
-						p.y += (dy / length) * p.speed * deltaTime;
+
+					if (!isNaN(length) && length > 0) {
+						p.x = lerp(p.x, lastPosition.x, interpolationFactor);
+						p.y = lerp(p.y, lastPosition.y, interpolationFactor);
 					}
 				}
 			}
