@@ -154,7 +154,6 @@
 
 		$socket.on('OtherPlayerMoved', (data) => {
 			const player = players.find((p) => p.name === data.name);
-			console.log('OtherPlayerMoved', data);
 			if (player) {
 				player.positionBuffer.push({ x: data.x, y: data.y, time: Date.now() });
 				if (player.positionBuffer.length > 10) {
@@ -214,7 +213,7 @@
 		}
 
 		if (player) {
-			if (time - lastPlayerUpdate >= 1000 / 144 && shouldUpdatePlayer) {
+			if (time - lastPlayerUpdate >= 1000 / 60 && shouldUpdatePlayer) {
 				lastPlayerUpdate = time;
 				$socket?.emit('PlayerMove', player);
 				shouldUpdatePlayer = false;
@@ -248,9 +247,9 @@
 	}
 
 	function updateplayers(deltaTime: number) {
-		const interpolationFactor = 0.1; // Adjust for smoother interpolation
-
 		players.forEach((p) => {
+			const speed = 60; // Adjust the speed as needed
+			const interpolationFactor = 1 - Math.exp((-speed * deltaTime) / 1000);
 			if (p.positionBuffer.length > 0) {
 				const lastPosition = p.positionBuffer[p.positionBuffer.length - 1];
 				const timeSinceLastPosition = Date.now() - lastPosition.time;
