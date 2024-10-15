@@ -213,7 +213,7 @@
 		}
 
 		if (player) {
-			if (time - lastPlayerUpdate >= 1000 / 60 && shouldUpdatePlayer) {
+			if (time - lastPlayerUpdate >= 1000 / 90 && shouldUpdatePlayer) {
 				lastPlayerUpdate = time;
 				$socket?.emit('PlayerMove', player);
 				shouldUpdatePlayer = false;
@@ -248,7 +248,7 @@
 
 	function updateplayers(deltaTime: number) {
 		players.forEach((p) => {
-			const speed = 60; // Adjust the speed as needed
+			const speed = 90; // Adjust the speed as needed
 			const interpolationFactor = 1 - Math.exp((-speed * deltaTime) / 1000);
 			if (p.positionBuffer.length > 0) {
 				const lastPosition = p.positionBuffer[p.positionBuffer.length - 1];
